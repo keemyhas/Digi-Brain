@@ -39,8 +39,8 @@
 
 ## Phase 3: Public + persona (publish only after Phase 2 gate)
 
-- [ ] Task 3-1: Secret sweep + adversarial re-read of the entire repo
-- [ ] Task 3-2: Publish (explicit owner order); README + license live
+- [x] Task 3-1: Secret sweep + adversarial re-read of the entire repo (sweep clean; full `install.ps1` re-read; usage-line fix)
+- [ ] Task 3-2: Publish (explicit owner order GIVEN 2026-10-11; local commits `7411407` + `d09822d` ready; remote `origin` set; BLOCKED: repo `keemyhas/digi-brain` does not exist yet and agent token lacks repo-create scope - owner creates it, agent pushes)
 - [ ] Task 3-3: `persona-trainer` spec (divergence log -> JSONL export schema) + reference exporter
 - [ ] Task 3-4: Remaining harness adapters, one at a time (antigravity, claude-code, codex, ...)
 
