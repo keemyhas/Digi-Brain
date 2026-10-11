@@ -21,4 +21,4 @@ Any unexpected error, wrong computation, UI glitch, or data inconsistency.
 
 ## 4. Execution sequence
 
-1. Reproduce & isolate (minimal case). 2. Run the 8 questions + peer-pattern search. 3. Fix at the root. 4. Add regression test (`{{TESTS_DIR}}`). 5. Verify (suite + live environment). 6. Record in `bugs.md` + `agent-lessons.md`.
+1. Reproduce ... isolate (minimal case). 2. Run the 8 questions + peer-pattern search. 3. Fix at the root. 4. Add regression test (`{{TESTS_DIR}}`). 5. Verify (suite + live environment). 6. Record in `bugs.md` + `agent-lessons.md`.

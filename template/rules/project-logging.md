@@ -11,7 +11,7 @@
 ## 2. Entry format (fixed)
 
 ```text
-## YYYY-MM-DD — <short title> (commit <sha or `uncommitted`) — <who>
+## YYYY-MM-DD - <short title> (commit <sha or `uncommitted`) - <who>
 - Asked: <owner intent>
 - Decided: <choice made>
 - Why: <driving trade-off / invariant>
@@ -21,6 +21,6 @@
 ## 3. Never-lose guarantees
 
 - APPEND-ONLY: never edit or delete past entries. Corrections are new entries referencing the old date.
-- Sync to all mirrors immediately on every append (see `memory-intake.md` §4).
+- Sync to all mirrors immediately on every append (see `memory-intake.md` section 4).
 - Staleness check: if `git log --oneline -1` is newer than the last entry, append the missing entry before starting new work.
-- Keep entries terse (4 bullets). Long rationale belongs in `decisions.md` — link it from the Why line.
+- Keep entries terse (4 bullets). Long rationale belongs in `decisions.md` - link it from the Why line.

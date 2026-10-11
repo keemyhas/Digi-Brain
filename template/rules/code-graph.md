@@ -1,6 +1,6 @@
 # Code-Graph Rule (optional tool)
 
-> Setup: if you use a code-graph / knowledge-graph tool, fill `{{CODE_GRAPH_*}}`. If not, delete this file — the brain works without it.
+> Setup: if you use a code-graph / knowledge-graph tool, fill `{{CODE_GRAPH_*}}`. If not, delete this file - the brain works without it.
 
 ## Rules
 

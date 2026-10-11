@@ -7,8 +7,8 @@ Server-side services: routes, middleware, validation, background jobs, and real-
 ## Boundaries & constraints
 
 - **Scope**: `{{BACKEND_DIRS}}` only.
-- **Structure**: new endpoints/logic live in their module's canonical location — never in global/shared entry files.
-- **Safety**: enforce auth middleware (`{{AUTH_MIDDLEWARE}}`) on every route; honor the owner's safety middleware (`{{SAFETY_MIDDLEWARE}}`, if any).
+- **Structure**: new endpoints/logic live in their module's canonical location - never in global/shared entry files.
+- **Safety**: enforce auth middleware (`{{AUTH_MIDDLEWARE}}`) on every route; honor the owner's safety middleware ({{SAFETY_MIDDLEWARE}}).
 - **Data safety**: parameterized queries only (`{{QUERY_PLACEHOLDER_STYLE}}`); no destructive raw SQL; multi-step writes in transactions with rollback.
 
 ## Core responsibilities

@@ -1,8 +1,8 @@
 # Operational Engineering Standards
 
-> Setup: fill `{{PLACEHOLDERS}}` (test command, migration path, safety paths), then delete this line.
+> Setup: fill every double-brace token (test command, migration path, safety paths), then delete this line.
 
-## 1. Test isolation & data protection
+## 1. Test isolation ... data protection
 
 - Tests NEVER run against live or shared-dev data. Use `{{TEST_COMMAND}}` targeting disposable fixtures/databases.
 - Tests create their own fixtures and clean them up deterministically. Never latch onto arbitrary existing records.
@@ -26,4 +26,10 @@
 
 ## 5. Safety invariants (owner-defined, highest precedence after explicit orders)
 
-{{SAFETY_INVARIANTS — e.g. paths that must never be blocked, data with legal/archival sanctity, forbidden operations. If none, write "None defined — add before enabling autonomous mode."}}
+{{SAFETY_INVARIANTS}}
+
+Guidance: list paths that must never be blocked, data with legal/archival sanctity, and forbidden operations. If empty, production autonomous mode stays OFF; test-mode activation (scripted checks with no live side effects) is still allowed so cold-boot verification can run.
+
+## 6. Git gates
+
+No `git commit` / `push` without explicit owner order. Activation of autonomous mode never lifts this gate. If institutional identity lives in a separate file, record its path here: {{SAFETY_INVARIANTS_FILE}}.

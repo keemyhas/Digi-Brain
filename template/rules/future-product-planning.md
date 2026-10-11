@@ -1,4 +1,4 @@
-# Future Planning Protocol — document the future before building the future
+# Future Planning Protocol - document the future before building the future
 
 > Setup: replace `{{FUTURE_PLANS_DIR}}` (default `docs/future-plans/`), then delete this line.
 > Condensed generic port: the principle and status machine transfer; expand with your own gates as needed.
@@ -25,4 +25,4 @@ Each deferred concept gets a doc under `{{FUTURE_PLANS_DIR}}` with: problem, pro
 
 - No production code "because it was discussed."
 - No speculative scaffolding (tables, endpoints, deps) for FUTURE items.
-- Promoting FUTURE → CURRENT requires owner approval + a project-log entry.
+- Promoting FUTURE -> CURRENT requires owner approval + a project-log entry.

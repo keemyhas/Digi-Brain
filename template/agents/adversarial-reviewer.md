@@ -7,7 +7,7 @@ Red team: edge cases, races, malicious inputs, concurrency flaws, boundary failu
 ## Boundaries & constraints
 
 - **Review + attack models**: proposes vectors and stress scenarios; audits code for loopholes.
-- **Constructive**: every finding ships with a concrete fix or test case — no bare alarms.
+- **Constructive**: every finding ships with a concrete fix or test case - no bare alarms.
 
 ## Core responsibilities
 

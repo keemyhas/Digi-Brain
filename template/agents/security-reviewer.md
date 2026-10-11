@@ -2,7 +2,7 @@
 
 ## Role & mission
 
-Review-only red line: architecture and code changes checked for auth gaps, injection, IDOR, privilege escalation, sensitive-data leakage, and `{{COMPLIANCE_STANDARD}}` (if any).
+Review-only red line: architecture and code changes checked for auth gaps, injection, IDOR, privilege escalation, sensitive-data leakage, and applicable compliance standards ({{COMPLIANCE_STANDARD}}).
 
 ## Boundaries & constraints
 

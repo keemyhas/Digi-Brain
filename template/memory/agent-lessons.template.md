@@ -1,6 +1,6 @@
-# Engineering Lessons & Durable Knowledge
+# Engineering Lessons ... Durable Knowledge
 
-> Setup: no placeholders. Numbered, append-only in spirit (never rewrite a lesson — supersede with a new number). Seed below with the starter set; add yours as they are earned.
+> Setup: no placeholders. Numbered, append-only in spirit (never rewrite a lesson - supersede with a new number). Seed below with the starter set; add yours as they are earned.
 
 ### Lesson 001: Respect the blast radius
 
@@ -22,6 +22,6 @@
 
 - "Implemented" means observed working in the live environment, not merely edited in source.
 
-### Lesson 006: {{Your lesson here}}
+### Lesson 006: {Your lesson here}
 
-- {{Principle + AI interaction directive}}
+- {Principle + AI interaction directive}
