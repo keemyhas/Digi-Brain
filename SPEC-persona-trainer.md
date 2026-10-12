@@ -65,3 +65,31 @@ Validate: each line parses as JSON and carries all required fields (exporter sel
 ## Open questions
 
 1. Weighting (correction recency/frequency) - deferred to training-time, not export format.
+
+## Schema: `digi-brain-divergence-pair-v2` (Enhanced Scoped Format)
+
+Adds contextual scoping to prevent project-specific corrections from becoming universal preferences:
+
+| Field | Type | Required | Meaning |
+|---|---|---|---|
+| `pair_id` | string | yes | Stable identifier: `div-<YYYYMMDD>-<NN>` |
+| `schema` | string | yes | `digi-brain-divergence-pair-v2` |
+| `date` | string | yes | Row date (`YYYY-MM-DD` or `unknown`) |
+| `twin_pick` | string | yes | What the twin chose |
+| `owner_correction` | string | yes | What the owner chose instead |
+| `scope` | string | yes | `project` vs `universal` vs `domain:<name>` |
+| `decision_category` | string | yes | `workflow`, `architecture`, `testing`, `style` |
+| `review_status` | string | yes | `verified`, `unreviewed`, `quarantined` |
+| `lesson` | string | no | Extracted principle |
+
+## Implementations & Privacy Defense
+
+Dual implementations share this specification:
+1. `tools/export_persona.py` (POSIX / Python 3 CLI)
+2. `exporter/export-persona.ps1` (Windows PowerShell 5.1 CLI)
+
+### Secret Scanning & Quarantine
+- Evaluates each record against credential and private token patterns (API keys, JWTs, AWS credentials, database URIs, private keys).
+- Matches are **quarantined** to `<out>.quarantine.jsonl` with row index and trigger reason.
+- Quarantined records are omitted from training datasets for owner review.
+- Strict local-first processing: never transmitted to external services.

@@ -10,7 +10,7 @@
 | Brain region | Job | File | Holds |
 |---|---|---|---|
 | Thalamus (relay) | Routes every session on wake-up | `rules/session-bootstrap.md` | Boot sequence section 1 |
-| Brainstem | Survival reflexes - override everything, never sleep | `rules/engineering-standards.md` (invariants section 5, git gates section 6) | Non-negotiable invariants |
+| Brainstem | Survival reflexes - override everything, never sleep | `rules/engineering-standards.md` + `rules/policy-enforcement.md` | Non-negotiable invariants, 3-layer policy, git gates |
 | Limbic system | Taste, values, who you are | `memory/personalities.md` | Owner profile, decision style, activated-twin rules |
 | Hippocampus | Episodic memory - what just happened | `memory/project-log.md` (append-only) | Asked -> Decided+Why -> Shipped per commit + session end |
 | Cerebellum | Muscle memory - skilled movement without thinking | `memory/patterns.md` + `{{WORKFLOWS_DIR}}` | How-templates, default multi-file flow |
@@ -59,7 +59,19 @@ Override hierarchy (top wins - a stale brain must NEVER override 1 or 2; if brai
 - Default multi-file flow: `{{WORKFLOWS_DIR}}/feature-development.md`; bug/security/data flows own their triggers.
 - Why-record: `memory/decisions.md` (+ `{{ADR_DIR}}`) - read before revisiting any architectural choice.
 
-## 6. Prefrontal cortex - autonomy gates
+## 6. Prefrontal cortex - autonomy gates & policy layers
+
+> Governed technically by `rules/policy-enforcement.md` and `tools/policy_engine.py`.
+> Distinguished into Layer A (Memory), Layer B (Policy), and Layer C (Host Enforcement).
+
+### Authorization States
+Sessions strictly transition across:
+1. `SUPERVISED` (default on wake-up; ask on ambiguity, standard non-destructive local work)
+2. `AUTONOMOUS` (activated twin mode; picks likeliest, signs picks, logs alternatives, never lifts git gates)
+3. `PENDING` (sensitive operation awaiting explicit per-action user grant)
+4. `DENIED` (user declined or readiness check blocked)
+5. `EXPIRED` (action-scoped or TTL-scoped authorization expired)
+6. `RESTRICTED` (error/safety tripwire engaged; recovery actions only)
 
 Autonomous pick-and-flag mode is OFF by default. Activates ONLY on the owner's exact phrase **`{{ACTIVATION_PHRASE}}`** (default: `activate second brain`).
 

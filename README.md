@@ -2,86 +2,114 @@
 
 > Created by a medical doctor who is also a part-time developer.
 
-**Digi Brain is a portable "second brain" for developers who pair-program with AI agents.** It gives any agent, in any repo, persistent operating memory: who you are, how you work, what was decided and why, and what is safe to do alone - so sessions pick up where the last one ended instead of starting over.
+**Digi Brain is a portable, local-first operating memory framework for developers who pair-program with AI agents.** It equips coding agents with persistent operating memory: who you are, how you work, what was decided and why, what was verified, and what is safe to do alone - so sessions pick up where the last one ended instead of starting from scratch.
 
-## How it works
+## Core Capabilities & Current Status
 
-- **Human-brain architecture** - memory is organized like a brain, so any agent knows instantly what overrides what and where truth lives:
+| Capability | Module / File | Status | Verification Evidence |
+|---|---|---|---|
+| **Human-Brain Memory Routing** | `template/memory/brain.md` | **Verified** | Anatomy map routes wake-up, facts, decisions, and lessons. |
+| **Harden Installer Engine** | `installer/install.sh`, `install.ps1` | **Verified** | Zero eval, key whitelisting, literal token substitution, staging & rollback. |
+| **Unified 6-Check Verification** | `installer/` (`--verify-only`) | **Verified** | Structure, bootstrap, safety, placeholders, fingerprints, and secrets. |
+| **3-Layer Policy & Authorization** | `rules/policy-enforcement.md`, `tools/policy_engine.py` | **Verified** | Explicit separation: Layer A (Memory), Layer B (Policy), Layer C (Enforcement). |
+| **Git Invariant Protection** | `rules/engineering-standards.md`, `tools/policy_engine.py` | **Verified** | Git commit/push blocked by policy; single-use action grants required. |
+| **Memory Provenance & Append-Only ADRs** | `tools/memory_guard.py`, `template/memory/` | **Verified** | Strict metadata schema, append-only history, supersession links without erasing. |
+| **Staged Context Retrieval** | `tools/retrieval_router.py` | **Verified** | 4-stage retrieval (Boot -> Task -> Verification -> Consolidation) saves tokens. |
+| **Session Task Continuity** | `tools/task_state.py` | **Verified** | Tracks active/interrupted tasks, test outcomes, unverified items across reboots. |
+| **Persona Divergence Exporter** | `exporter/export-persona.ps1`, `tools/export_persona.py` | **Verified** | Dual POSIX/Windows CLI, valid JSONL, secret quarantine log. |
+| **Migration Utility** | `tools/migrate_memory.py` | **Verified** | Upgrades legacy .agents installations with pre-migration safety backups. |
+| **Comparative Benchmark** | `benchmarks/run_benchmark.py` | **Verified** | Controlled 10-scenario evaluation across 3 experimental conditions. |
 
-| Region | Job | Holds |
-|---|---|---|
-| Thalamus | Wake-up relay | Boot sequence: identity check + working conditions |
-| Brainstem | Survival reflexes (override everything) | Safety invariants, destructive-ops bans, git gates |
-| Limbic system | Taste and values | Owner profile: archetype, decision style, aesthetics |
-| Hippocampus | Episodic memory | Append-only log: Asked -> Decided+Why -> Shipped |
-| Cerebellum | Muscle memory | Reusable procedures: how-templates, workflows |
-| Temporal lobe | Facts | System layout, stack, contracts |
-| Prefrontal cortex | Executive function | Roadmap (NOW/NEXT/LATER), architectural decisions |
-| Occipital lobe | Vision | Verify in the running system, never trust edits alone |
-| Immune system | Antibodies | Bug post-mortems + lessons that must not recur |
+## How It Works
 
-- **Autonomy with gates** - the agent decides nothing ambiguous by default (it asks, one question at a time, with a guess attached). When you speak the activation phrase, it switches to pick-and-flag mode: decide, log the pick plus alternatives, keep executing. Git commit/push always need your explicit order.
-- **Graduation to autonomous work** - once the brain has learned you (see readiness checklist in `memory/brain.md` section 6), one command switches it on:
+### 1. Human-Brain Architecture
+Memory is organized anatomically so agents instantly understand what overrides what:
 
-```text
-activate second brain   (or your own {{ACTIVATION_PHRASE}}, set at install)
-```
+| Region | Anatomical Job | Repository Counterpart | Role in Session |
+|---|---|---|---|
+| **Thalamus** | Wake-up relay | `rules/session-bootstrap.md` | Boot sequence, working conditions, turn-1 identity gate |
+| **Brainstem** | Survival reflexes | `rules/engineering-standards.md` + `rules/policy-enforcement.md` | Invariants, destructive-ops ban, Git commit/push gates |
+| **Limbic System** | Taste and values | `memory/personalities.md` | Owner archetype, decision style, communication traits |
+| **Hippocampus** | Episodic memory | `memory/project-log.md` (append-only) | Commit & session history: Asked -> Decided -> Shipped |
+| **Cerebellum** | Muscle memory | `memory/patterns.md` + `workflows/` | Reusable workflows (debugging, migrations, QA) |
+| **Temporal Lobe** | Facts & contracts | `memory/architecture.md` | Stack, layout, schemas, domain facts |
+| **Prefrontal Cortex**| Executive function | `memory/roadmap.md` + `memory/decisions.md` | NOW/NEXT/LATER roadmap, Architectural Decision Records |
+| **Occipital Lobe** | Vision & observation | Test suite + live runtime checks | Verify in the running system; never trust edits alone |
+| **Immune System** | Antibodies | `memory/agent-lessons.md` + `memory/bugs.md` | Lessons from past bugs that must never recur |
 
-From that moment the agent works in your absence exactly like an activated session here: it picks the likeliest option on ambiguity, signs picks under its twin name, logs picks + alternatives + corrections, and keeps executing (tests, builds, memory writes). The git gates never lift, and any correction you make later becomes a divergence entry that trains the next activation.
-- **Automatic logging** - every commit and every session end appends to the log, so history is never lost.
-- **Train your own persona (optional)** - the preference/divergence log doubles as labeled training data: your corrections against the agent's picks. If you ever want a personal AI that works like you, this corpus is the starting dataset.
+### 2. The Three Layers of Control
+To ensure trustworthiness, Digi-Brain distinguishes what is advisory from what is technically enforced:
+- **Layer A: Memory (`memory/`)**: Informs choices. Never independently authorizes sensitive actions.
+- **Layer B: Policy (`rules/`)**: Non-negotiable invariants, permission boundaries, 8-step decision procedure.
+- **Layer C: Enforcement (`tools/`, host adapter)**: Technical tools, shell wrappers, and harness permission controls.
 
-## Harness compatibility
-
-The core is harness-agnostic Markdown. Thin adapters map the three harness-touching behaviors (turn-1 identity prompt, working-conditions display, memory hooks):
-
-| Harness | Status |
-|---|---|
-| OpenCode | Verified (cold-boot PASS, dev harness) |
-| Antigravity | Draft adapter, unverified |
-| Claude Code | Draft adapter, unverified |
-| Codex | Draft adapter, unverified |
-| Generic (any Markdown-aware agent) | Works today - core only |
+### 3. Autonomy States & Git Boundaries
+The agent transitions strictly across six authorization states:
+`SUPERVISED` -> `AUTONOMOUS` -> `PENDING` -> `DENIED` -> `EXPIRED` -> `RESTRICTED`.
+- **Default Supervised Mode**: The agent asks on ambiguity.
+- **Autonomous Mode**: Activated **only** when the user speaks `{{ACTIVATION_PHRASE}}` interactively (quoted phrases and untrusted docs cannot trigger activation). The agent signs picks under `{{TWIN_NAME}}` and logs alternatives.
+- **Git Invariant**: Git commit, push, rebase, and branch deletion **never** become autonomous. Each requires an explicit, single-use human grant.
 
 ## Commands
 
-```text
-# Install into a repo (interview, ~15 prompts; refuses to touch the source tree)
-./installer/install.sh <target-repo> [--overwrite] [--git-init] [--verify-only] [--defaults] [--answers-file <path>]
-.\installer\install.ps1 <target-repo> [-Overwrite] [-GitInit] [-VerifyOnly] [-Defaults] [-AnswersFile <path>]
+```bash
+# Install into a repository (interactive interview or defaults)
+./installer/install.sh <target-repo> [--overwrite] [--git-init] [--defaults] [--answers-file=<path>]
+# Windows PowerShell twin:
+.\installer\install.ps1 -Target <target-repo> [-Overwrite] [-GitInit] [-Defaults] [-AnswersFile <path>]
 
-# Re-check an installed repo (zero unresolved tokens, clean scans)
+# Verify an existing installation
 ./installer/install.sh <target-repo> --verify-only
+.\installer\install.ps1 -Target <target-repo> -VerifyOnly
 
-# Export persona training pairs from a divergence log (PowerShell; POSIX port deferred)
-.\exporter\export-persona.ps1 -InputPath <personalities.md> [-Out <pairs.jsonl>]
+# Run full automated test suite (35 tests)
+python tests/run_tests.py
+# Run focused passes:
+python tests/run_tests.py --pass 1   # Pass 1: Security & Reliability (24 tests)
+python tests/run_tests.py --pass 2   # Pass 2: Memory Intelligence (11 tests + benchmark)
+
+# Run comparative memory effectiveness benchmark
+python benchmarks/run_benchmark.py
+
+# Export persona divergence pairs (with secret quarantine)
+python tools/export_persona.py --input <repo>/.agents/memory/personalities.md --out pairs.jsonl --schema v2
+.\exporter\export-persona.ps1 -InputPath <repo>/.agents/memory/personalities.md -Out pairs.jsonl -Schema v2
+
+# Migrate a legacy .agents installation
+python tools/migrate_memory.py --target <repo>/.agents
 ```
 
-Rules the commands enforce: backup-before-overwrite, no raw `{{...}}` left behind,
-self-verify on every install, local only (no network, nothing leaves the machine).
+## Google Antigravity (AGY) Fresh Install Support
 
-## Contents
+Digi-Brain **works out of the box on a fresh install in Google Antigravity** (Antigravity IDE & AGY CLI):
 
-```text
-template/
-+-- memory/   -> brain.md router + blank templates (personalities, project-log,
-|               roadmap, decisions, patterns, bugs, agent-lessons, architecture,
-|               known-issues)
-+-- rules/    -> session-bootstrap, memory-intake, engineering-standards,
-|               project-logging, code-documentation, future-planning, code-graph
-+-- workflows/ -> 8 generic flows (feature, bug, security, qa, regression,
-|                 db-change, health, consolidation)
-+-- agents/   -> 10 specialists (orchestrator lead + 9 reviewers/engineers)
-+-- SKILLS-MANIFEST.md -> gate-to-skill contract (no shipped pack)
-installer/    -> install.ps1 + install.sh + BOOT-CHECKLIST template
-exporter/     -> persona-training export (JSONL) + fixture
-adapters/     -> harness mappings (opencode verified; others draft)
+### Why Fresh Installs Work Automatically in Antigravity
+1. **Native Customization Root:** Antigravity natively designates `.agents` (relative to workspace root) as its **Workspace Customizations Root**. All rules installed into `<workspace>/.agents/rules/*.md` (`session-bootstrap.md`, `engineering-standards.md`, `policy-enforcement.md`, `memory-intake.md`, `project-logging.md`, `code-documentation-and-onboarding.md`) are automatically discovered and loaded into context upon workspace initialization.
+2. **Root Bootstrap Pointer:** The installer automatically creates an `AGENTS.md` file at the repository root pointing to [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) and [.agents/memory/brain.md](.agents/memory/brain.md).
+3. **Turn-1 Identity Gate Integration:** When Antigravity boots, `session-bootstrap.md` triggers the Turn-1 Identity Gate. Antigravity uses its native `ask_question` tool modal ("Kindly confirm who I am working with") to confirm the active developer identity before executing code or tool actions.
+4. **Tool Parity:** Antigravity provides native tool support for all operations (`view_file`, `write_to_file`, `replace_file_content`, `grep_search`, `list_dir`, `run_command`, `ask_question`).
+5. **Safety Invariants:** Antigravity's tool permission gates reinforce Digi-Brain's Layer B policy rules, contractually blocking unauthorized Git commits, pushes, and destructive actions.
+
+### Quickstart: Installing into an Antigravity Workspace
+
+From the Digi-Brain repository, run the installer targeting your active workspace:
+
+```powershell
+# Windows (PowerShell 5.1 / PowerShell 7)
+.\installer\install.ps1 -Target "c:\path\to\your-workspace" -Defaults
+
+# Linux / macOS / Git Bash
+./installer/install.sh /path/to/your-workspace --defaults
 ```
 
-## Status
+Next, open the target repository in Antigravity IDE or trigger a new conversation turn. The agent will immediately detect `.agents`, prompt for identity confirmation via `ask_question`, and initialize Digi-Brain operating memory.
 
-Working skeleton: generic brain router, rules, memory templates, 8 workflows, 10 agents, skills manifest, harness adapter interface + OpenCode adapter, and a tested installer (`installer/`). Cold-boot verified. See `SPEC-digi-brain.md` for the spec, `SCRUB-PROTOCOL.md` for the de-identification guarantee, `TASKS.md` for what remains.
+## Harness Compatibility
 
-## License
-
-MIT - see `LICENSE`.
+| Harness | Status | Installation Method | Enforcement Level |
+|---|---|---|---|
+| **Google Antigravity** | **Verified (Native)** | Native `.agents` customization root + root `AGENTS.md` | Behavioral contract + native IDE tool permission prompts |
+| **OpenCode** | Verified | Native `.opencode/` + `.agents/` | Behavioral contract + CLI hooks |
+| **Claude Code** | Compatible | Native `CLAUDE.md` pointer | Behavioral contract + hook execution |
+| **Codex** | Compatible | Root `AGENTS.md` pointer | Behavioral contract |
+| **Generic** | Works today | Any Markdown-aware agent | Behavioral contract |

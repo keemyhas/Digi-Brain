@@ -1,63 +1,206 @@
-# Digi Brain installer (Windows). POSIX twin: install.sh - same behavior, shared SPEC-installer.md contract.
-# Usage: .\install.ps1 <target-repo> [--overwrite] [--git-init] [--verify-only] [--defaults] [--answers-file <path>]
+# Digi Brain installer (Windows PowerShell 5.1). POSIX twin: install.sh - same behavior, shared SPEC-installer.md contract.
+# Usage: .\install.ps1 -Target <repo> [-Overwrite] [-GitInit] [-VerifyOnly] [-Defaults] [-AnswersFile <path>]
 # No network access. Nothing leaves the machine.
-
 param(
     [string]$Target = "",
-    [switch]$Overwrite = $false,
-    [switch]$GitInit = $false,
-    [switch]$VerifyOnly = $false,
-    [switch]$Defaults = $false,
+    [switch]$Overwrite,
+    [switch]$GitInit,
+    [switch]$VerifyOnly,
+    [switch]$Defaults,
     [string]$AnswersFile = ""
 )
 
 $ErrorActionPreference = "Stop"
-$script:AnswerMap = @{}
 
-function Fail([string]$msg) { Write-Output "INSTALLER ABORT: $msg"; exit 1 }
-
-function Read-Answer([string]$key, [string]$prompt, [string]$default) {
-    if ($script:AnswerMap.ContainsKey($key)) { return $script:AnswerMap[$key] }
-    if ($Defaults) { return $default }
-    if ($default -ne "") { $suffix = " [$default]" } else { $suffix = "" }
-    $ans = Read-Host "$prompt$suffix"
-    if ([string]::IsNullOrWhiteSpace($ans)) { return $default }
-    return $ans.Trim()
+function Fail([string]$msg) {
+    Write-Error "INSTALLER ABORT: $msg"
+    exit 1
 }
 
+if ([string]::IsNullOrWhiteSpace($Target)) {
+    Fail "usage: .\install.ps1 -Target <repo> [-Overwrite] [-GitInit] [-VerifyOnly] [-Defaults] [-AnswersFile <path>]"
+}
+
+if (-not (Test-Path -LiteralPath $Target)) {
+    try {
+        New-Item -ItemType Directory -Path $Target -Force | Out-Null
+    } catch {
+        Fail "cannot create target directory: $Target"
+    }
+}
+$Target = (Resolve-Path -LiteralPath $Target).ProviderPath
+
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$TemplateDir = Join-Path $ScriptDir "..\template"
+$TemplateDir = Join-Path (Split-Path -Parent $ScriptDir) "template"
+$BootTemplate = Join-Path $ScriptDir "BOOT-CHECKLIST.template.md"
 
-if ([string]::IsNullOrWhiteSpace($Target)) { Fail "usage: .\install.ps1 <target-repo> [--overwrite] [--git-init]" }
-if (-not (Test-Path -LiteralPath $TemplateDir)) { Fail "template/ not found next to installer." }
+if (-not (Test-Path -LiteralPath $TemplateDir)) {
+    Fail "template/ directory not found at $TemplateDir"
+}
 
-# Refuse to install into the Digi Brain source tree itself.
-if ((Test-Path -LiteralPath (Join-Path $Target "SPEC-digi-brain.md")) -or (Test-Path -LiteralPath (Join-Path $Target "template"))) {
-    Fail "target looks like the Digi Brain source tree. Install into a foreign repo."
+if ((Test-Path -LiteralPath (Join-Path $Target "SPEC-digi-brain.md")) -and (Test-Path -LiteralPath (Join-Path $Target "template"))) {
+    Fail "target looks like the Digi Brain source tree ($Target). Install into a foreign repo."
 }
 
 $AgentsDir = Join-Path $Target ".agents"
-if ((Test-Path -LiteralPath $AgentsDir) -and (-not $Overwrite) -and (-not $VerifyOnly)) {
-    Fail "$AgentsDir exists. Re-run with --overwrite (a timestamped backup is written first)."
+
+# Unified verification function
+function Test-DigiBrainInstallation([string]$checkDir) {
+    $vPass = $true
+    Write-Output "=== DIGI-BRAIN VERIFICATION ==="
+
+    # 1. Structure check
+    $structOk = $true
+    foreach ($d in @("memory", "rules", "agents", "workflows")) {
+        $p = Join-Path $checkDir $d
+        if (-not (Test-Path -LiteralPath $p)) {
+            Write-Output "  MISSING DIR: $d"
+            $structOk = $false
+        }
+    }
+    if ($structOk) {
+        Write-Output "STRUCTURE CHECK: PASS"
+    } else {
+        Write-Output "STRUCTURE CHECK: FAIL"
+        $vPass = $false
+    }
+
+    # 2. Bootstrap check
+    $bootOk = $true
+    foreach ($f in @("memory\brain.md", "BOOT-CHECKLIST.md", "rules\session-bootstrap.md", "skills-map.md", "SKILLS-MANIFEST.md")) {
+        $p = Join-Path $checkDir $f
+        if (-not (Test-Path -LiteralPath $p)) {
+            Write-Output "  MISSING BOOTSTRAP FILE: $f"
+            $bootOk = $false
+        }
+    }
+    if ($bootOk) {
+        Write-Output "BOOTSTRAP CHECK: PASS"
+    } else {
+        Write-Output "BOOTSTRAP CHECK: FAIL"
+        $vPass = $false
+    }
+
+    # 3. Safety check
+    $safeOk = $true
+    foreach ($f in @("rules\engineering-standards.md", "rules\memory-intake.md", "rules\project-logging.md", "rules\code-documentation-and-onboarding.md")) {
+        $p = Join-Path $checkDir $f
+        if (-not (Test-Path -LiteralPath $p)) {
+            Write-Output "  MISSING SAFETY FILE: $f"
+            $safeOk = $false
+        }
+    }
+    if ($safeOk) {
+        Write-Output "SAFETY CHECK: PASS"
+    } else {
+        Write-Output "SAFETY CHECK: FAIL"
+        $vPass = $false
+    }
+
+    # 4. Placeholder check
+    $unresolved = Get-ChildItem -Path $checkDir -Recurse -Include "*.md" -File | Select-String -Pattern "\{\{[A-Z0-9_*]+\}\}"
+    if (-not $unresolved) {
+        Write-Output "PLACEHOLDER CHECK: PASS"
+    } else {
+        Write-Output "PLACEHOLDER CHECK: FAIL"
+        $unresolved | Select-Object -First 5 | ForEach-Object { Write-Output "  $($_.Filename):$($_.LineNumber): $($_.Line.Trim())" }
+        $vPass = $false
+    }
+
+    # 5. Fingerprint scan
+    $fp = Get-ChildItem -Path $checkDir -Recurse -Include "*.md" -File | Select-String -Pattern "abdul|hassan|archon|falx|vellora|synapseems" | Where-Object { $_.Line -notmatch "grep -rn" -and $_.Line -notmatch "fingerprint" }
+    if (-not $fp) {
+        Write-Output "FINGERPRINT SCAN: PASS"
+    } else {
+        Write-Output "FINGERPRINT SCAN: FAIL"
+        $fp | Select-Object -First 5 | ForEach-Object { Write-Output "  $($_.Filename):$($_.LineNumber): $($_.Line.Trim())" }
+        $vPass = $false
+    }
+
+    # 6. Secret-pattern scan
+    $secretPattern = "ghp_[A-Za-z0-9_]{36,}|sk-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|bearer\s+[A-Za-z0-9_\-\.]{20,}|password\s*[:=]\s*['`"][^'`"]+['`"]"
+    $secHits = Get-ChildItem -Path $checkDir -Recurse -Include "*.md" -File | Select-String -Pattern $secretPattern
+    if (-not $secHits) {
+        Write-Output "SECRET-PATTERN SCAN: PASS"
+    } else {
+        Write-Output "SECRET-PATTERN SCAN: FAIL"
+        $secHits | Select-Object -First 5 | ForEach-Object { Write-Output "  $($_.Filename):$($_.LineNumber): $($_.Line.Trim())" }
+        $vPass = $false
+    }
+
+    if ($vPass) {
+        Write-Output "OVERALL: PASS"
+    } else {
+        Write-Output "OVERALL: FAIL"
+    }
+    $script:LastVerificationPassed = $vPass
 }
 
 if ($VerifyOnly) {
-    if (-not (Test-Path -LiteralPath $AgentsDir)) { Fail "nothing installed at $AgentsDir." }
-    $leftover = Get-ChildItem -Path $AgentsDir -Recurse -Include "*.md" | Select-String -Pattern "\{\{[A-Z_]+\}\}"
-    if ($leftover) { Fail "unresolved placeholders remain."; $leftover | Select-Object -First 10 }
-    Write-Output "VERIFY OK: no unresolved placeholders under $AgentsDir."
-    exit 0
+    if (-not (Test-Path -LiteralPath $AgentsDir)) {
+        Fail "nothing installed at $AgentsDir"
+    }
+    Test-DigiBrainInstallation $AgentsDir
+    if ($script:LastVerificationPassed) { exit 0 } else { exit 1 }
+}
+
+if ((Test-Path -LiteralPath $AgentsDir) -and (-not $Overwrite)) {
+    Fail "$AgentsDir exists. Re-run with -Overwrite (timestamped backup first)."
+}
+
+# Approved configuration whitelist
+$ValidKeys = @(
+    "OWNER_NAME", "OWNER_ROLE", "PROJECT_NAME", "ACTIVATION_PHRASE", "TWIN_NAME", "SAFETY_INVARIANTS",
+    "SAFETY_INVARIANTS_FILE", "BACKEND_DIRS", "BACKEND_SCOPE", "FRONTEND_DIRS", "FRONTEND_SCOPE",
+    "TEST_COMMAND", "TYPE_CHECK", "TEST_FRAMEWORK", "TESTS_DIR", "TEST_SCOPE", "DATABASE", "MIGRATIONS_DIR",
+    "MIGRATION_NAMING", "DOCS_DIR", "API_DOCS", "ADR_DIR", "FUTURE_PLANS_DIR", "QA_DIR", "FIXTURE_PREFIX",
+    "OWNER_PERSONAS", "DEV_URL", "AUTH_MIDDLEWARE", "SAFETY_MIDDLEWARE", "QUERY_PLACEHOLDER_STYLE",
+    "DATA_PROTECTION_STANDARD", "SENSITIVE_RESOURCES", "KEY_COLUMNS", "PROTECTED_COLUMNS_POLICY",
+    "DOMAIN_REVIEWER", "WORKFLOWS_DIR", "DOMAIN_DOCS", "SYNC_RULE", "OWNER_DOMAIN", "COMPLIANCE_STANDARD",
+    "OFFLINE_STRATEGY", "LARGE_CLIENT_FILES", "CODE_GRAPH", "CODE_GRAPH_*"
+)
+
+$AnswerMap = @{}
+
+if ($AnswersFile -ne "") {
+    if (-not (Test-Path -LiteralPath $AnswersFile)) {
+        Fail "answers file not found: $AnswersFile"
+    }
+    foreach ($rawLine in (Get-Content -LiteralPath $AnswersFile)) {
+        $line = $rawLine.Trim()
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#")) { continue }
+        $idx = $line.IndexOf("=")
+        if ($idx -le 0) {
+            Fail "malformed line in answers file: $line"
+        }
+        $k = $line.Substring(0, $idx).Trim()
+        $v = $line.Substring($idx + 1).Trim()
+        if (-not ($ValidKeys -contains $k)) {
+            Fail "unrecognized configuration key in answers file: $k"
+        }
+        $AnswerMap[$k] = $v
+    }
+}
+
+function Read-Answer([string]$key, [string]$prompt, [string]$defaultVal) {
+    if (-not ($ValidKeys -contains $key)) {
+        Fail "internal error: unapproved prompt key $key"
+    }
+    if ($AnswerMap.ContainsKey($key)) {
+        return [string]$AnswerMap[$key]
+    }
+    if ($Defaults) {
+        return $defaultVal
+    }
+    $ans = Read-Host "$prompt [$defaultVal]"
+    if ([string]::IsNullOrWhiteSpace($ans)) {
+        return $defaultVal
+    }
+    return $ans.Trim()
 }
 
 Write-Output "--- Digi Brain install: single interview (Enter = default, 'none' where allowed) ---"
-if ($AnswersFile -ne "") {
-    if (-not (Test-Path -LiteralPath $AnswersFile)) { Fail "answers file not found: $AnswersFile" }
-    foreach ($line in (Get-Content -LiteralPath $AnswersFile)) {
-        if ($line -match "^\s*(#|$)") { continue }
-        $i = $line.IndexOf("=")
-        if ($i -gt 0) { $script:AnswerMap[$line.Substring(0, $i).Trim()] = $line.Substring($i + 1).Trim() }
-    }
-}
+
 $A = @{}
 $A["OWNER_NAME"] = Read-Answer "OWNER_NAME" "Owner name" "Ada Example"
 $A["OWNER_ROLE"] = Read-Answer "OWNER_ROLE" "Owner role" "Solo Developer"
@@ -109,64 +252,93 @@ if ($A["TWIN_NAME"] -eq "none") {
 if ($A["DOMAIN_REVIEWER"] -eq "none") {
     $A["DOMAIN_REVIEWER"] = "Owner (default; type a name to override)"
 }
-
-# Backup + render.
-if (Test-Path -LiteralPath $AgentsDir) {
-    $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $backup = Join-Path $Target ".agents.backup-$stamp"
-    Copy-Item -LiteralPath $AgentsDir -Destination $backup -Recurse -Force
-    Write-Output "Backup written: $backup"
-    Remove-Item -LiteralPath $AgentsDir -Recurse -Force
-}
-New-Item -ItemType Directory -Path $AgentsDir -Force | Out-Null
-Copy-Item -Path (Join-Path $TemplateDir "*") -Destination $AgentsDir -Recurse -Force
-
-if ($A["CODE_GRAPH"] -eq "none") {
-    $cg = Join-Path $AgentsDir "rules\code-graph.md"
-    if (Test-Path -LiteralPath $cg) { Remove-Item -LiteralPath $cg -Force }
-}
 $A["CODE_GRAPH_*"] = $A["CODE_GRAPH"]
 
-$files = Get-ChildItem -Path $AgentsDir -Recurse -File
-foreach ($f in $files) {
+# Staging directory for atomic install and rollback
+$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+$stagingDir = Join-Path $Target (".agents.staging." + $stamp + "." + $PID)
+if (Test-Path -LiteralPath $stagingDir) { Remove-Item -LiteralPath $stagingDir -Recurse -Force }
+New-Item -ItemType Directory -Path $stagingDir -Force | Out-Null
+
+Copy-Item -Path (Join-Path $TemplateDir "*") -Destination $stagingDir -Recurse -Force
+
+if ($A["CODE_GRAPH"] -eq "none") {
+    $cg = Join-Path $stagingDir "rules\code-graph.md"
+    if (Test-Path -LiteralPath $cg) { Remove-Item -LiteralPath $cg -Force }
+}
+
+# Skills map
+$map = "# Skills map (generated - all rows start as prose fallbacks; replace with harness skill names)`n`n| Gate | Harness skill |`n|---|---|`n"
+$map += "| spec-before-code | none - prose fallback |`n| multi-file build | none - prose fallback |`n| bug-fix | none - prose fallback |`n| security | none - prose fallback |`n| shipping | none - prose fallback |`n"
+$map += "`nSource: SKILLS-MANIFEST.md next to this map. Fallback exercise (mandatory on first session): run one gate entirely in prose and log it.`n"
+Set-Content -LiteralPath (Join-Path $stagingDir "skills-map.md") -Value $map
+
+# Boot checklist
+if (Test-Path -LiteralPath $BootTemplate) {
+    Copy-Item -LiteralPath $BootTemplate -Destination (Join-Path $stagingDir "BOOT-CHECKLIST.md") -Force
+}
+
+# Perform literal substitutions in staging
+$stagedFiles = Get-ChildItem -Path $stagingDir -Recurse -File
+foreach ($f in $stagedFiles) {
     $text = [System.IO.File]::ReadAllText($f.FullName)
     foreach ($k in $A.Keys) {
-        $text = $text.Replace("{{" + $k + "}}", $A[$k])
+        $text = $text.Replace("{{" + $k + "}}", [string]$A[$k])
     }
+    # Strip setup banner lines
+    $filteredLines = $text -split "`r?`n" | Where-Object { $_ -notmatch "^> Setup:" }
+    $text = [string]::Join("`n", $filteredLines) + "`n"
     [System.IO.File]::WriteAllText($f.FullName, $text)
+
     if ($f.Name -like "*.template.md") {
-        $new = $f.FullName -replace "\.template\.md$", ".md"
-        Move-Item -LiteralPath $f.FullName -Destination $new -Force
+        $destName = $f.FullName -replace "\.template\.md$", ".md"
+        Move-Item -LiteralPath $f.FullName -Destination $destName -Force
     }
 }
 
-# Skills map.
-$map = "# Skills map (generated - all rows start as prose fallbacks; replace with harness skill names)`n`n| Gate | Harness skill |`n|---|---|`n"
-$map += "| spec-before-code | none - prose fallback |`n| multi-file build | none - prose fallback |`n| bug-fix | none - prose fallback |`n| security | none - prose fallback |`n| shipping | none - prose fallback |`n"
-$map += "`nSource: SKILLS-MANIFEST.md next to this map. Fallback exercise (mandatory on first session): run one gate entirely in prose (no skill invocation) and log which gate + what the skill would have added.`n"
-Set-Content -LiteralPath (Join-Path $AgentsDir "skills-map.md") -Value $map
+# Run verification on staged directory
+Test-DigiBrainInstallation $stagingDir
+if (-not $script:LastVerificationPassed) {
+    Remove-Item -LiteralPath $stagingDir -Recurse -Force
+    Fail "verification failed on staged output. Target was not modified."
+}
 
-# Boot checklist.
-$bootSrc = Join-Path $ScriptDir "BOOT-CHECKLIST.template.md"
-if (Test-Path -LiteralPath $bootSrc) {
-    $boot = [System.IO.File]::ReadAllText($bootSrc)
-    foreach ($k in $A.Keys) { $boot = $boot.Replace("{{" + $k + "}}", $A[$k]) }
-    Set-Content -LiteralPath (Join-Path $AgentsDir "BOOT-CHECKLIST.md") -Value $boot
+# Activation: backup existing .agents if present
+$backupPath = $null
+if (Test-Path -LiteralPath $AgentsDir) {
+    $backupPath = Join-Path $Target (".agents.backup-" + $stamp)
+    Move-Item -LiteralPath $AgentsDir -Destination $backupPath -Force
+    Write-Output "Backup written: $backupPath"
+}
+
+try {
+    Move-Item -LiteralPath $stagingDir -Destination $AgentsDir -Force
+} catch {
+    if ($null -ne $backupPath -and (Test-Path -LiteralPath $backupPath)) {
+        Move-Item -LiteralPath $backupPath -Destination $AgentsDir -Force
+        Write-Error "ROLLBACK: restored previous installation from $backupPath"
+    }
+    Fail "activation failed: cannot move staging to $AgentsDir. Error: $_"
 }
 
 if ($GitInit -and (-not (Test-Path -LiteralPath (Join-Path $Target ".git")))) {
-    git -C $Target init 2>&1 | Out-Null
+    try { git -C $Target init 2>&1 | Out-Null } catch {}
 }
 
-# Self-verify: banners removed, zero tokens, clean scans.
-foreach ($f in (Get-ChildItem -Path $AgentsDir -Recurse -File)) {
-    $lines = [System.IO.File]::ReadAllLines($f.FullName) | Where-Object { $_ -notmatch "^> Setup:" }
-    [System.IO.File]::WriteAllLines($f.FullName, $lines)
+# Ensure root bootstrap pointer exists for harnesses (Antigravity, OpenCode, Claude Code)
+$rootAgentsMd = Join-Path $Target "AGENTS.md"
+if (-not (Test-Path -LiteralPath $rootAgentsMd)) {
+    $rootAgentsContent = @"
+# Digi-Brain Operating Memory
+
+This repository uses Digi-Brain persistent operating memory.
+- **Session Bootstrap:** Follow [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) on turn 1.
+- **Brain Router:** [.agents/memory/brain.md](.agents/memory/brain.md)
+- **Engineering Standards:** [.agents/rules/engineering-standards.md](.agents/rules/engineering-standards.md)
+- **Policy Enforcement:** [.agents/rules/policy-enforcement.md](.agents/rules/policy-enforcement.md)
+"@
+    [System.IO.File]::WriteAllText($rootAgentsMd, $rootAgentsContent.Trim() + "`n")
 }
-$leftover = Get-ChildItem -Path $AgentsDir -Recurse -Include "*.md" | Select-String -Pattern "\{\{[A-Z_*]+\}\}"
-if ($leftover) { Write-Output "VERIFY FAILED: unresolved placeholders:"; $leftover | Select-Object -First 10; exit 1 }
-$fp = Get-ChildItem -Path $AgentsDir -Recurse -Include "*.md" | Select-String -Pattern "abdul|hassan|archon|falx|vellora|synapseems" | Where-Object { $_.Line -notmatch "grep -rniE" }
-if ($fp) { Write-Output "VERIFY FAILED: fingerprint terms in output."; exit 1 }
 
 Write-Output "---"
 Write-Output "INSTALL OK: $AgentsDir"

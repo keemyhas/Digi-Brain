@@ -1,0 +1,62 @@
+name: Digi-Brain CI Matrix
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test-posix:
+    name: Test Suite (Linux / POSIX)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Installer Smoke Test (install.sh)
+        run: |
+          chmod +x installer/install.sh
+          mkdir -p /tmp/digi-smoke-test
+          ./installer/install.sh /tmp/digi-smoke-test --defaults
+          ./installer/install.sh /tmp/digi-smoke-test --verify-only
+
+      - name: Run Full Test Suite
+        run: |
+          python tests/run_tests.py
+
+  test-windows:
+    name: Test Suite (Windows / PowerShell)
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run Installer Smoke Test (install.ps1)
+        shell: powershell
+        run: |
+          $testDir = Join-Path $env:TEMP "digi-smoke-ps1"
+          New-Item -ItemType Directory -Path $testDir -Force
+          powershell -ExecutionPolicy Bypass -File installer/install.ps1 -Target $testDir -Defaults
+          powershell -ExecutionPolicy Bypass -File installer/install.ps1 -Target $testDir -VerifyOnly
+
+      - name: Run Full Test Suite
+        shell: powershell
+        run: |
+          python tests/run_tests.py

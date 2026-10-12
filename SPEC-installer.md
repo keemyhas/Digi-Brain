@@ -32,14 +32,38 @@ Substitution rule: after the interview, scan `template/` for `{{[A-Z_]+}}`; ever
 
 ## Behavior
 
-1. **Preflight**: target path exists; if `<target>/.agents/` exists -> show diff summary, require explicit `--overwrite` + write timestamped backup (`<target>/.agents.backup-<ts>/`). Refuse to run inside the Digi Brain source tree itself.
-2. **Interview**: prompt table above (defaults offered, free text accepted, "none" where allowed).
-3. **Render**: copy `template/` -> `<target>/.agents/`, renaming `*.template.md` -> `*.md`, substituting tokens. `SKILLS-MANIFEST.md` + owner skill mapping -> `<target>/.agents/skills-map.md` (unmapped rows = `none - prose fallback`).
-4. **Self-verify** (must all pass, or roll back):
-   - Zero unresolved `{{...}}` tokens in output.
-   - Fingerprint/secret scans clean (same patterns as `SCRUB-PROTOCOL.md` section 3, pointed at output).
-   - Boot checklist file written to `<target>/.agents/BOOT-CHECKLIST.md` (turn-1 gate, 3-log read, Kanban read, first log entry).
-5. **Report**: files written, tokens resolved/deleted, verification results, exact next step ("open a fresh agent session in the target repo and follow BOOT-CHECKLIST.md").
+1. **Preflight**:
+   - Target path validated and resolved to absolute canonical path.
+   - Refuse to run inside the Digi Brain source tree itself.
+   - If `<target>/.agents/` exists -> require explicit `--overwrite` (otherwise abort).
+2. **Interview & Input Handling**:
+   - Inputs are validated against a strict key whitelist (43 approved keys).
+   - Unrecognized configuration keys are rejected immediately.
+   - Answers are treated strictly as data: command substitutions (`$(...)`), metacharacters, quotes, and punctuation remain inert without shell evaluation.
+   - Both interactive mode and answers file (`--answers-file=<path>` or `--answers-file <path>`) supported.
+3. **Staging**:
+   - Installation renders into an isolated staging directory (`<target>/.agents.staging.<timestamp>.<pid>`).
+   - Copy `template/` -> staging directory.
+   - If `CODE_GRAPH` is "none", `rules/code-graph.md` is removed.
+   - Generate `skills-map.md` with standard fallback mappings.
+   - Render `BOOT-CHECKLIST.md` with configured values.
+   - Perform literal token substitutions across all staged files.
+   - Rename `*.template.md` -> `*.md`.
+   - Strip all `> Setup:` banner lines.
+4. **Unified Verification Suite** (runs against staged directory; also invoked via `--verify-only`):
+   - **STRUCTURE CHECK**: Verifies `memory/`, `rules/`, `agents/`, `workflows/` exist.
+   - **BOOTSTRAP CHECK**: Verifies `memory/brain.md`, `BOOT-CHECKLIST.md`, `rules/session-bootstrap.md`, `skills-map.md`, `SKILLS-MANIFEST.md`.
+   - **SAFETY CHECK**: Verifies `rules/engineering-standards.md`, `rules/memory-intake.md`, `rules/project-logging.md`, `rules/code-documentation-and-onboarding.md`.
+   - **PLACEHOLDER CHECK**: Scans all `*.md` files for unresolved `{{[A-Z0-9_*]+}}` tokens.
+   - **FINGERPRINT SCAN**: Heuristic scan for forbidden scrub terms (`abdul|hassan|archon|falx|vellora|synapseems`).
+   - **SECRET-PATTERN SCAN**: Heuristic scan for tokens, private keys, AWS credentials, JWTs, and embedded passwords.
+   - All 6 checks must PASS (overall exit status 0). If any check fails, overall status is FAIL (exit status 1).
+5. **Safe Activation & Rollback**:
+   - Staging directory is activated ONLY if all verification checks pass.
+   - If target already has an existing `.agents/`, it is moved to `<target>/.agents.backup-<timestamp>`.
+   - Staging directory is moved to `.agents/`.
+   - If activation fails, automatic rollback restores the backup.
+   - If verification fails during staging, staging directory is deleted and target is untouched.
 
 ## Project structure
 

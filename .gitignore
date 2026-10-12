@@ -1,0 +1,19 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing and staging artifacts
+.agents.backup*
+.agents.staging*
+*.tmp
+*.quarantine.jsonl
+*.log
+
+# Environment and editor configs
+.env
+.venv/
+env/
+venv/
+.idea/
+.vscode/
