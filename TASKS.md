@@ -46,7 +46,6 @@
 - [x] Task 3-4: Remaining harness adapters - shipped as DRAFT-unverified (`adapters/antigravity.md`, `claude-code.md`, `codex.md`, each with verification-debt checklist). Rule: banners come off only after a cold-boot pass on that harness.
 
 ## Phase 4 (new): Reporter CLI (optional writer; augment, don't replace)
-
 - [x] Task 4-1: Doubt cycle on the reporter proposal (fresh-context adversarial review -> reconcile; verdict: augment-don't-replace).
 - [x] Task 4-2: Cross-model review offered (CLIs absent on this machine - surfaced, not skipped); owner pasted packet externally; findings reconciled (atomic-append, quarantine scope, shim retention, mirror fan-out, precedence rule).
 - [x] Task 4-3: `SPEC-reporter.md` (10 hard requirements, command contract, fixture plan). Implementation (`reporter/db.py`) NOT started - needs explicit order. Amended post-cross-model review: true-append formalism, stdin timeout, split verify (warn history / gate new), checksum framing + boot spot-check, 3.6 syntax ceiling + floor check.
@@ -54,3 +53,7 @@
   tested 11/11, dual-path proven - then retired and deleted. Rationale: convention over code;
   agents write Markdown directly, `rules/project-logging.md` enforces; Python reserved for
   read-only export/scaffold needs only. Design preserved in `SPEC-reporter.md` (superseded).
+
+## Post-public: autonomous graduation (owner request 2026-10-12)
+
+- [x] Activation command + graduation readiness gate (rain.md section 6a, BOOT-CHECKLIST autonomy check, README graduation note). Owner-absent work unlocks only on: real profile, 10+ log entries incl. a correction, live roadmap, one proven cold-boot.

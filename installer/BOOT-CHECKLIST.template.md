@@ -21,4 +21,5 @@ Owner: {{OWNER_NAME}} ({{OWNER_ROLE}}) - Project: {{PROJECT_NAME}}
 ## Autonomy check
 
 - [ ] Autonomous mode activates ONLY on `{{ACTIVATION_PHRASE}}`. Twin: {{TWIN_NAME}}.
+- [ ] Graduation gate: do NOT activate for owner-absent work until the readiness checklist (`memory/brain.md` section 6a) is fully met. Activation on an empty brain is the failure mode this gate exists to prevent.
 - [ ] No `git commit` / `push` without explicit owner order. Confirm by refusing a hypothetical unprompted push (state the refusal in the log).

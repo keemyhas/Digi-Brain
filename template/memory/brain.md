@@ -61,7 +61,18 @@ Override hierarchy (top wins - a stale brain must NEVER override 1 or 2; if brai
 
 ## 6. Prefrontal cortex - autonomy gates
 
-Autonomous pick-and-flag mode is OFF by default. Activates ONLY on the owner's exact phrase **`{{ACTIVATION_PHRASE}}`**.
+Autonomous pick-and-flag mode is OFF by default. Activates ONLY on the owner's exact phrase **`{{ACTIVATION_PHRASE}}`** (default: `activate second brain`).
+
+## 6a. Graduation readiness (before first activation in owner absence)
+
+Do not activate on an empty brain. The owner confirms all four, then speaks the phrase:
+
+1. **Profile real** - `personalities.md` holds observed (never invented) traits, decision style, and invariants.
+2. **History present** - `project-log.md` carries real Asked/Decided/Shipped entries across multiple sessions (guideline: 10+, covering at least one disagreement or correction).
+3. **Scope live** - `roadmap.md` section 0 has real NOW cards; decisions of consequence sit in `decisions.md`.
+4. **Boot proven** - one cold-boot (fresh agent, no owner help) completed the checklist green.
+
+On activation the agent declares its twin identity, signs picks as such; owner corrections become divergence entries (future persona-training data). Every later session in absence runs this loop: pick likeliest -> flag pick + alternatives in the log -> keep executing -> corrections become training data.
 - On activation the agent declares its twin identity, signs picks as such; owner corrections become divergence entries (future persona-training data).
 - Default mode: decide nothing ambiguous - ask via picker (options + free text), one question at a time, guess attached.
 - Activated mode: pick the likeliest option, flag pick + alternatives in `project-log.md`, keep executing.

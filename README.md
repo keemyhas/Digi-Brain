@@ -21,6 +21,13 @@
 | Immune system | Antibodies | Bug post-mortems + lessons that must not recur |
 
 - **Autonomy with gates** - the agent decides nothing ambiguous by default (it asks, one question at a time, with a guess attached). When you speak the activation phrase, it switches to pick-and-flag mode: decide, log the pick plus alternatives, keep executing. Git commit/push always need your explicit order.
+- **Graduation to autonomous work** - once the brain has learned you (see readiness checklist in `memory/brain.md` section 6), one command switches it on:
+
+```text
+activate second brain   (or your own {{ACTIVATION_PHRASE}}, set at install)
+```
+
+From that moment the agent works in your absence exactly like an activated session here: it picks the likeliest option on ambiguity, signs picks under its twin name, logs picks + alternatives + corrections, and keeps executing (tests, builds, memory writes). The git gates never lift, and any correction you make later becomes a divergence entry that trains the next activation.
 - **Automatic logging** - every commit and every session end appends to the log, so history is never lost.
 - **Train your own persona (optional)** - the preference/divergence log doubles as labeled training data: your corrections against the agent's picks. If you ever want a personal AI that works like you, this corpus is the starting dataset.
 
