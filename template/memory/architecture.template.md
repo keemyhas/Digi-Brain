@@ -1,4 +1,5 @@
 # Architecture Memory
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: replace this file with a verified survey of YOUR repository (stack, layout, domains), then delete this line. Required by `memory/brain.md` temporal lobe and `workflows/memory-consolidation.md`. Verified code always supersedes this file.
 

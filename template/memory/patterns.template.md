@@ -1,4 +1,5 @@
 # Architectural ... Development Patterns
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: replace code samples with your stack's real ones (verify from your codebase, never invent), then delete this line. Copy these templates - don't reinvent per task.
 

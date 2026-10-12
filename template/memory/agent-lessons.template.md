@@ -1,4 +1,5 @@
 # Engineering Lessons ... Durable Knowledge
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: no placeholders. Numbered, append-only in spirit (never rewrite a lesson - supersede with a new number). Seed below with the starter set; add yours as they are earned.
 

@@ -1,4 +1,5 @@
 # Master Roadmap - {{PROJECT_NAME}}
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: replace `{{PROJECT_NAME}}`, define your eras/phases below, then delete this line.
 > Convention: headings are columns, bullets are cards, each card links to its brief. Router: `memory/brain.md` -> section 0 for NOW/NEXT scope.

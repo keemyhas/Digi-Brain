@@ -1,4 +1,5 @@
 # Developer Personalities ... Cognitive Profiles
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: replace `{{OWNER_NAME}}` / `{{OWNER_ROLE}}` with the owner, record real traits as they are revealed (never invent), then delete this line.
 

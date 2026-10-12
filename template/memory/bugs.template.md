@@ -1,4 +1,5 @@
 # Bug History ... Prevention Log
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: no placeholders. Append post-mortems; check here before touching the same domain twice. Never record credentials, tokens, or personal data in entries.
 

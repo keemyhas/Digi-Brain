@@ -41,8 +41,16 @@
 
 - [x] Task 3-1: Secret sweep + adversarial re-read of the entire repo (sweep clean; full `install.ps1` re-read; usage-line fix)
 - [x] Task 3-2: Publish - LIVE at `https://github.com/keemyhas/Digi-Brain` (commits `7411407` + `d09822d` + `f97cfda`, branch `master`, MIT LICENSE). Note: repo created as `Digi-Brain`; remote set to canonical URL.
-- [ ] Task 3-3: `persona-trainer` spec (divergence log -> JSONL export schema) + reference exporter
-- [ ] Task 3-4: Remaining harness adapters, one at a time (antigravity, claude-code, codex, ...)
+- [x] Task 3-3: `persona-trainer` spec (divergence log -> JSONL export schema) + reference exporter
+  - Shipped: `SPEC-persona-trainer.md` (schema `digi-brain-divergence-pair-v1`), `exporter/export-persona.ps1` (parser-clean, fixture test green at exact 1/2/1 split, self-validating), `exporter/test-fixture.md`. POSIX port deferred (no shell to test). Found + fixed: `$Input` automatic-variable collision.
+- [x] Task 3-4: Remaining harness adapters - shipped as DRAFT-unverified (`adapters/antigravity.md`, `claude-code.md`, `codex.md`, each with verification-debt checklist). Rule: banners come off only after a cold-boot pass on that harness.
 
-### Checkpoint: public
-- [ ] Repo live, installs clean on a foreign machine, first external pilot logged
+## Phase 4 (new): Reporter CLI (optional writer; augment, don't replace)
+
+- [x] Task 4-1: Doubt cycle on the reporter proposal (fresh-context adversarial review -> reconcile; verdict: augment-don't-replace).
+- [x] Task 4-2: Cross-model review offered (CLIs absent on this machine - surfaced, not skipped); owner pasted packet externally; findings reconciled (atomic-append, quarantine scope, shim retention, mirror fan-out, precedence rule).
+- [x] Task 4-3: `SPEC-reporter.md` (10 hard requirements, command contract, fixture plan). Implementation (`reporter/db.py`) NOT started - needs explicit order. Amended post-cross-model review: true-append formalism, stdin timeout, split verify (warn history / gate new), checksum framing + boot spot-check, 3.6 syntax ceiling + floor check.
+- [x] Task 4-4 (SUPERSEDED by owner decision 2026-10-11): `reporter/db.py` was implemented,
+  tested 11/11, dual-path proven - then retired and deleted. Rationale: convention over code;
+  agents write Markdown directly, `rules/project-logging.md` enforces; Python reserved for
+  read-only export/scaffold needs only. Design preserved in `SPEC-reporter.md` (superseded).

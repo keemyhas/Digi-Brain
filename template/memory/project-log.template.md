@@ -1,5 +1,7 @@
 # Project Log - Asked / Decided / Shipped
 
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md. -->
+
 > Setup: no placeholders. APPEND-ONLY from the first entry. Rule: `rules/project-logging.md`. Router: `memory/brain.md`.
 
 ## Entry template (copy, do not alter past entries)

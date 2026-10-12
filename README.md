@@ -30,23 +30,46 @@ The core is harness-agnostic Markdown. Thin adapters map the three harness-touch
 
 | Harness | Status |
 |---|---|
-| OpenCode | Planned first (dev harness) |
-| Antigravity | Planned |
-| Claude Code | Planned |
-| Codex | Planned |
+| OpenCode | Verified (cold-boot PASS, dev harness) |
+| Antigravity | Draft adapter, unverified |
+| Claude Code | Draft adapter, unverified |
+| Codex | Draft adapter, unverified |
 | Generic (any Markdown-aware agent) | Works today - core only |
 
-## Contents (`template/`)
+## Commands
+
+```text
+# Install into a repo (interview, ~15 prompts; refuses to touch the source tree)
+./installer/install.sh <target-repo> [--overwrite] [--git-init] [--verify-only] [--defaults] [--answers-file <path>]
+.\installer\install.ps1 <target-repo> [-Overwrite] [-GitInit] [-VerifyOnly] [-Defaults] [-AnswersFile <path>]
+
+# Re-check an installed repo (zero unresolved tokens, clean scans)
+./installer/install.sh <target-repo> --verify-only
+
+# Export persona training pairs from a divergence log (PowerShell; POSIX port deferred)
+.\exporter\export-persona.ps1 -InputPath <personalities.md> [-Out <pairs.jsonl>]
+```
+
+Rules the commands enforce: backup-before-overwrite, no raw `{{...}}` left behind,
+self-verify on every install, local only (no network, nothing leaves the machine).
+
+## Contents
 
 ```text
 template/
 +-- memory/   -> brain.md router + blank templates (personalities, project-log,
-|               roadmap, decisions, patterns, bugs, agent-lessons)
+|               roadmap, decisions, patterns, bugs, agent-lessons, architecture,
+|               known-issues)
 +-- rules/    -> session-bootstrap, memory-intake, engineering-standards,
-                project-logging (all generic, placeholders only)
+|               project-logging, code-documentation, future-planning, code-graph
++-- workflows/ -> 8 generic flows (feature, bug, security, qa, regression,
+|                 db-change, health, consolidation)
++-- agents/   -> 10 specialists (orchestrator lead + 9 reviewers/engineers)
++-- SKILLS-MANIFEST.md -> gate-to-skill contract (no shipped pack)
+installer/    -> install.ps1 + install.sh + BOOT-CHECKLIST template
+exporter/     -> persona-training export (JSONL) + fixture
+adapters/     -> harness mappings (opencode verified; others draft)
 ```
-
-Agents, workflows, and skills adapters are tracked in `TASKS.md` (Phase 1b+).
 
 ## Status
 

@@ -1,4 +1,5 @@
 # Architectural Decisions Record
+<!-- APPEND-ONLY: new entries go at the bottom. Never edit past entries. Enforced by rules/project-logging.md; the reporter CLI (	ools/db.py) enforces it structurally. -->
 
 > Setup: no placeholders. New decisions append here (or `{{ADR_DIR}}`); the project log links them. Read this before revisiting any architectural choice.
 

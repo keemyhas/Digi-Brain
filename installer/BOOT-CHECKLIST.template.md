@@ -5,7 +5,7 @@ Owner: {{OWNER_NAME}} ({{OWNER_ROLE}}) - Project: {{PROJECT_NAME}}
 ## Turn 1 (mandatory, before any other work)
 
 - [ ] Display: `Working Conditions: [x] bugs recording | [x] code-graph | [x] personalities | [x] memory sync` (mark `[ ]` + reason for anything missing).
-- [ ] Ask *"Kindly confirm who I am working with"* via the harness picker. Gate all work on the answer. No picker? State the assumed identity in plain text, log the assumption, continue (see `rules/session-bootstrap.md` fallback).
+- [ ] Ask *"Kindly confirm who I am working with"* via the harness picker. Gate all work on the answer. No picker in this harness? Don't deadlock: state the assumed identity in plain text, log the assumption in the first log entry, continue (full fallback in `rules/session-bootstrap.md`).
 
 ## Orientation reads
 
