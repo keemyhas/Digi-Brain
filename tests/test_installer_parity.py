@@ -10,7 +10,9 @@ import unittest
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 INSTALL_SH = os.path.join(REPO_DIR, "installer", "install.sh")
 INSTALL_PS1 = os.path.join(REPO_DIR, "installer", "install.ps1")
+IS_WINDOWS = os.name == "nt"
 BASH_PATH = r"C:\Program Files\Git\bin\bash.exe"
+WINDOWS_ONLY_REASON = "parity requires install.sh and install.ps1 together; install.ps1 only runs on Windows"
 
 class TestInstallerParity(unittest.TestCase):
     def setUp(self):
@@ -29,6 +31,7 @@ class TestInstallerParity(unittest.TestCase):
         d = drive.replace(":", "").lower()
         return f"/{d}" + rest.replace("\\", "/")
 
+    @unittest.skipUnless(IS_WINDOWS, WINDOWS_ONLY_REASON)
     def test_default_installation_parity(self):
         # 1. Run install.sh with --defaults
         posix_target = self._to_posix_path(self.sh_target)

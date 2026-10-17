@@ -19,6 +19,8 @@ from tools.export_persona import export_persona, scan_secrets
 REPO_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 EXPORTER_PS1 = os.path.join(REPO_DIR, 'exporter', 'export-persona.ps1')
 FIXTURE_PATH = os.path.join(REPO_DIR, 'exporter', 'test-fixture.md')
+IS_WINDOWS = os.name == 'nt'
+WINDOWS_ONLY_REASON = 'export-persona.ps1 targets Windows PowerShell; this test only runs on Windows'
 
 class TestPersonaExport(unittest.TestCase):
     def setUp(self):
@@ -84,6 +86,7 @@ class TestPersonaExport(unittest.TestCase):
             self.assertEqual(rec['twin_pick'], special_pick)
             self.assertEqual(rec['owner_correction'], special_corr)
 
+    @unittest.skipUnless(IS_WINDOWS, WINDOWS_ONLY_REASON)
     def test_parity_between_python_and_powershell(self):
         py_out = os.path.join(self.test_dir, 'py_parity.jsonl')
         ps_out = os.path.join(self.test_dir, 'ps_parity.jsonl')
