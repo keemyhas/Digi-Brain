@@ -404,6 +404,19 @@ This repository uses Digi-Brain persistent operating memory.
 EOF
 fi
 
+if [ ! -e "$TARGET/CLAUDE.md" ]; then
+  cat << 'EOF' > "$TARGET/CLAUDE.md"
+# Digi-Brain Operating Memory
+
+This repository uses Digi-Brain persistent operating memory.
+- **Session Bootstrap:** Follow [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) on turn 1.
+- **Brain Router:** [.agents/memory/brain.md](.agents/memory/brain.md)
+- **Engineering Standards:** [.agents/rules/engineering-standards.md](.agents/rules/engineering-standards.md)
+- **Policy Enforcement:** [.agents/rules/policy-enforcement.md](.agents/rules/policy-enforcement.md)
+EOF
+fi
+
+
 printf -- "---\n"
 printf "INSTALL OK: %s\n" "$AGENTS_DIR"
 printf "Next: open a fresh agent session in the target repo and follow .agents/BOOT-CHECKLIST.md\n"

@@ -340,6 +340,21 @@ This repository uses Digi-Brain persistent operating memory.
     [System.IO.File]::WriteAllText($rootAgentsMd, $rootAgentsContent.Trim() + "`n")
 }
 
+$rootClaudeMd = Join-Path $Target "CLAUDE.md"
+if (-not (Test-Path -LiteralPath $rootClaudeMd)) {
+    $rootClaudeContent = @"
+# Digi-Brain Operating Memory
+
+This repository uses Digi-Brain persistent operating memory.
+- **Session Bootstrap:** Follow [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) on turn 1.
+- **Brain Router:** [.agents/memory/brain.md](.agents/memory/brain.md)
+- **Engineering Standards:** [.agents/rules/engineering-standards.md](.agents/rules/engineering-standards.md)
+- **Policy Enforcement:** [.agents/rules/policy-enforcement.md](.agents/rules/policy-enforcement.md)
+"@
+    [System.IO.File]::WriteAllText($rootClaudeMd, $rootClaudeContent.Trim() + "`n")
+}
+
+
 Write-Output "---"
 Write-Output "INSTALL OK: $AgentsDir"
 Write-Output "Next: open a fresh agent session in the target repo and follow .agents/BOOT-CHECKLIST.md"

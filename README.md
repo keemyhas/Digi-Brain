@@ -79,18 +79,24 @@ python tools/export_persona.py --input <repo>/.agents/memory/personalities.md --
 python tools/migrate_memory.py --target <repo>/.agents
 ```
 
-## Google Antigravity (AGY) Fresh Install Support
+## Google Antigravity & Claude Code Fresh Install Support
 
-Digi-Brain **works out of the box on a fresh install in Google Antigravity** (Antigravity IDE & AGY CLI):
+Digi-Brain **works out of the box on a fresh install in both Google Antigravity and Claude Code**:
 
-### Why Fresh Installs Work Automatically in Antigravity
-1. **Native Customization Root:** Antigravity natively designates `.agents` (relative to workspace root) as its **Workspace Customizations Root**. All rules installed into `<workspace>/.agents/rules/*.md` (`session-bootstrap.md`, `engineering-standards.md`, `policy-enforcement.md`, `memory-intake.md`, `project-logging.md`, `code-documentation-and-onboarding.md`) are automatically discovered and loaded into context upon workspace initialization.
-2. **Root Bootstrap Pointer:** The installer automatically creates an `AGENTS.md` file at the repository root pointing to [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) and [.agents/memory/brain.md](.agents/memory/brain.md).
-3. **Turn-1 Identity Gate Integration:** When Antigravity boots, `session-bootstrap.md` triggers the Turn-1 Identity Gate. Antigravity uses its native `ask_question` tool modal ("Kindly confirm who I am working with") to confirm the active developer identity before executing code or tool actions.
-4. **Tool Parity:** Antigravity provides native tool support for all operations (`view_file`, `write_to_file`, `replace_file_content`, `grep_search`, `list_dir`, `run_command`, `ask_question`).
-5. **Safety Invariants:** Antigravity's tool permission gates reinforce Digi-Brain's Layer B policy rules, contractually blocking unauthorized Git commits, pushes, and destructive actions.
+### 1. Google Antigravity (Antigravity IDE & AGY CLI)
+- **Native Customization Root:** Antigravity natively designates `.agents` (relative to workspace root) as its **Workspace Customizations Root**. All rules installed into `<workspace>/.agents/rules/*.md` (`session-bootstrap.md`, `engineering-standards.md`, `policy-enforcement.md`, `memory-intake.md`, `project-logging.md`, `code-documentation-and-onboarding.md`) are automatically discovered and loaded into context upon workspace initialization.
+- **Root Bootstrap Pointer:** The installer automatically creates an `AGENTS.md` file at the repository root pointing to [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) and [.agents/memory/brain.md](.agents/memory/brain.md).
+- **Turn-1 Identity Gate Integration:** When Antigravity boots, `session-bootstrap.md` triggers the Turn-1 Identity Gate. Antigravity uses its native `ask_question` tool modal ("Kindly confirm who I am working with") to confirm the active developer identity before executing code or tool actions.
+- **Tool Parity:** Antigravity provides native tool support for all operations (`view_file`, `write_to_file`, `replace_file_content`, `grep_search`, `list_dir`, `run_command`, `ask_question`).
+- **Safety Invariants:** Antigravity's tool permission gates reinforce Digi-Brain's Layer B policy rules, contractually blocking unauthorized Git commits, pushes, and destructive actions.
 
-### Quickstart: Installing into an Antigravity Workspace
+### 2. Anthropic Claude Code (Claude CLI)
+- **Native Root Bootstrap Discovery:** Claude Code natively prioritizes `CLAUDE.md` at the repository root upon startup. The installer drops both `CLAUDE.md` and `AGENTS.md` pointing to [.agents/rules/session-bootstrap.md](.agents/rules/session-bootstrap.md) and [.agents/memory/brain.md](.agents/memory/brain.md) for 100% turnkey bootstrap.
+- **Turn-1 Identity Gate Integration:** On session startup, Claude Code evaluates `session-bootstrap.md`, outputs the working conditions header, and prompts for developer confirmation via `AskUserQuestion` before performing modifications.
+- **Rules & Memory Routing:** Claude Code loads rules from `.agents/rules/` and navigates operating memory through `.agents/memory/brain.md`.
+- **Harness Permission Gates:** Claude Code's interactive execution confirmation prompts on bash commands reinforce Digi-Brain's Layer B policy gates, preventing silent git commits, remote pushes, or unmonitored script executions.
+
+### Quickstart: Installing into an Antigravity or Claude Code Workspace
 
 From the Digi-Brain repository, run the installer targeting your active workspace:
 
@@ -102,14 +108,15 @@ From the Digi-Brain repository, run the installer targeting your active workspac
 ./installer/install.sh /path/to/your-workspace --defaults
 ```
 
-Next, open the target repository in Antigravity IDE or trigger a new conversation turn. The agent will immediately detect `.agents`, prompt for identity confirmation via `ask_question`, and initialize Digi-Brain operating memory.
+Next, open the target repository in Antigravity IDE or start a `claude` session. The agent will immediately detect `.agents` and `AGENTS.md`/`CLAUDE.md`, prompt for identity confirmation, and initialize Digi-Brain operating memory.
 
 ## Harness Compatibility
 
 | Harness | Status | Installation Method | Enforcement Level |
 |---|---|---|---|
 | **Google Antigravity** | **Verified (Native)** | Native `.agents` customization root + root `AGENTS.md` | Behavioral contract + native IDE tool permission prompts |
+| **Claude Code** | **Verified (Native)** | Native `CLAUDE.md` + `AGENTS.md` root bootstrap pointer | Behavioral contract + interactive tool execution prompts |
 | **OpenCode** | Verified | Native `.opencode/` + `.agents/` | Behavioral contract + CLI hooks |
-| **Claude Code** | Compatible | Native `CLAUDE.md` pointer | Behavioral contract + hook execution |
 | **Codex** | Compatible | Root `AGENTS.md` pointer | Behavioral contract |
 | **Generic** | Works today | Any Markdown-aware agent | Behavioral contract |
+

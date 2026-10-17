@@ -81,5 +81,16 @@ class TestInstallerParity(unittest.TestCase):
             c_ps_root = f.read().replace("\r\n", "\n").strip()
         self.assertEqual(c_sh_root, c_ps_root, "Content mismatch in root AGENTS.md!")
 
+        # 6. Compare root CLAUDE.md bootstrap pointer (for Claude Code parity)
+        root_sh_claude = os.path.join(self.sh_target, "CLAUDE.md")
+        root_ps_claude = os.path.join(self.ps1_target, "CLAUDE.md")
+        self.assertTrue(os.path.exists(root_sh_claude), "install.sh did not create root CLAUDE.md")
+        self.assertTrue(os.path.exists(root_ps_claude), "install.ps1 did not create root CLAUDE.md")
+        with open(root_sh_claude, "r", encoding="utf-8") as f:
+            c_sh_claude = f.read().replace("\r\n", "\n").strip()
+        with open(root_ps_claude, "r", encoding="utf-8") as f:
+            c_ps_claude = f.read().replace("\r\n", "\n").strip()
+        self.assertEqual(c_sh_claude, c_ps_claude, "Content mismatch in root CLAUDE.md!")
+
 if __name__ == "__main__":
     unittest.main()
