@@ -1,0 +1,3 @@
+# POSIX shell scripts must survive WSL / macOS / CI clones on Windows hosts
+*.sh text eol=lf
+*.py text eol=lf
