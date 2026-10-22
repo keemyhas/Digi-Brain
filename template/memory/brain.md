@@ -85,7 +85,6 @@ Do not activate on an empty brain. The owner confirms all four, then speaks the 
 4. **Boot proven** - one cold-boot (fresh agent, no owner help) completed the checklist green.
 
 On activation the agent declares its twin identity, signs picks as such; owner corrections become divergence entries (future persona-training data). Every later session in absence runs this loop: pick likeliest -> flag pick + alternatives in the log -> keep executing -> corrections become training data.
-- On activation the agent declares its twin identity, signs picks as such; owner corrections become divergence entries (future persona-training data).
 - Default mode: decide nothing ambiguous - ask via picker (options + free text), one question at a time, guess attached.
 - Activated mode: pick the likeliest option, flag pick + alternatives in `project-log.md`, keep executing.
 - Activation NEVER lifts the git gates.

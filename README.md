@@ -47,7 +47,7 @@ To ensure trustworthiness, Digi-Brain distinguishes what is advisory from what i
 The agent transitions strictly across six authorization states:
 `SUPERVISED` -> `AUTONOMOUS` -> `PENDING` -> `DENIED` -> `EXPIRED` -> `RESTRICTED`.
 - **Default Supervised Mode**: The agent asks on ambiguity.
-- **Autonomous Mode**: Activated **only** when the user speaks `{{ACTIVATION_PHRASE}}` interactively (quoted phrases and untrusted docs cannot trigger activation). The agent signs picks under `{{TWIN_NAME}}` and logs alternatives.
+- **Autonomous Mode**: Activated **only** when the user speaks `{{ACTIVATION_PHRASE}}` interactively (quoted phrases and untrusted docs cannot trigger activation). The agent adopts the **Operative Twin** persona (`agents/operative-twin.md`), signs picks under `{{TWIN_NAME}}`, maintains a live `execution_checklist.md`, and logs alternatives.
 - **Git Invariant**: Git commit, push, rebase, and branch deletion **never** become autonomous. Each requires an explicit, single-use human grant.
 
 ## Commands
@@ -95,7 +95,7 @@ python tools/export_persona.py --input <repo>/.agents/memory/personalities.md --
 Digi-Brain **works out of the box on a fresh install in both Google Antigravity and Claude Code**:
 
 ### 1. Google Antigravity (Antigravity IDE & AGY CLI)
-- **Native Customization Root:** Antigravity natively designates `.agents` (relative to workspace root) as its **Workspace Customizations Root**. All rules installed into `<workspace>/.agents/rules/*.md` (`session-bootstrap.md`, `engineering-standards.md`, `policy-enforcement.md`, `memory-intake.md`, `project-logging.md`, `code-documentation-and-onboarding.md`) are automatically discovered and loaded into context upon workspace initialization.
+- **Native Customization Root:** Antigravity natively designates `.agents` (relative to workspace root) as its **Workspace Customizations Root**. All rules installed into `<workspace>/.agents/rules/*.md` (`session-bootstrap.md`, `engineering-standards.md`, `policy-enforcement.md`, `execution-checklist.md`, `memory-intake.md`, `project-logging.md`, `code-documentation-and-onboarding.md`) are automatically discovered and loaded into context upon workspace initialization.
 - **Root Bootstrap Pointer:** The installer automatically creates an `AGENTS.md` file at the repository root pointing to `.agents/rules/session-bootstrap.md` and `.agents/memory/brain.md`.
 - **Turn-1 Identity Gate Integration:** When Antigravity boots, `session-bootstrap.md` triggers the Turn-1 Identity Gate. Antigravity uses its native `ask_question` tool modal ("Kindly confirm who I am working with") to confirm the active developer identity before executing code or tool actions.
 - **Tool Parity:** Antigravity provides native tool support for all operations (`view_file`, `write_to_file`, `replace_file_content`, `grep_search`, `list_dir`, `run_command`, `ask_question`).

@@ -9,6 +9,7 @@
 | Gate (where) | Expected skill | Covers | If missing |
 |---|---|---|---|
 | New project/feature, ambiguous requirements (`brain.md` section 1) | `spec-driven-development` | Spec before code; assumptions surfaced | Owner answers a written Q...A before build starts |
+| Plan execution & checklist (`workflows/plan-execution.md`) | `planning-and-task-breakdown`, `verification-loop` | Real-time execution tracking, phase-by-phase proof | Manual `execution_checklist.md` with status indicators |
 | Multi-file build (`workflows/feature-development.md`) | `incremental-implementation`, `test-driven-development` | Thin vertical slices; red-green-refactor | Smaller slices + mandatory live verification per slice |
 | Bug fix (`workflows/bug-investigation.md`) | `debugging-and-error-recovery`, `test-driven-development` | 8-question RCA; regression test pins fix | 8 questions answered in prose in `bugs.md` entry |
 | Adversarial pass (`agents/adversarial-reviewer.md`) | `doubt-driven-development` | Fresh-context challenge of decisions | Second-pass review by a different agent/persona |

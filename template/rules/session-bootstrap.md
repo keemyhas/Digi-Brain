@@ -14,12 +14,12 @@ Mark `[ ]` with a one-line reason for anything missing or disabled.
 
 ## 2. Identity confirmation (mandatory turn-1 gate)
 
-Ask *"Kindly confirm who I am working with"* via the harness picker **before any research, reads, or edits** - even if identity is inferable from history. Execution is gated on the answer.
+Ask *"Kindly confirm who I am working with"* via the harness picker or interactive modal tool (e.g. `ask_question` in Antigravity or equivalent interactive dialog) **before any research, reads, or edits** - even if identity is inferable from history. Execution is gated on the answer.
 
-- Offer known contributors (e.g. `{{OWNER_NAME}} ({{OWNER_ROLE}})`) plus a free-text option.
+- **Interactive Modal Invariant**: In environments with modal dialog tools, present an interactive selectable modal containing known contributors (e.g. `{{OWNER_NAME}} ({{OWNER_ROLE}})`) alongside the default write-in option.
 - Attribute all subsequently recorded traits/decisions to the confirmed identity in `memory/personalities.md`.
-- If a new contributor appears, create their profile section before proceeding.
-- No-picker fallback (headless/CLI harnesses): when no interactive picker exists, state the assumed identity in plain text (e.g. "Proceeding as {{OWNER_NAME}} - no picker available"), log the assumption in the session's first log entry, and continue. Never deadlock waiting for a picker that cannot appear.
+- If a new contributor appears, create their dedicated profile section before proceeding.
+- **No-picker fallback (headless/CLI harnesses)**: when no interactive picker exists, state the assumed identity in plain text (e.g. "Proceeding as {{OWNER_NAME}} - no picker available"), log the assumption in the session's first log entry, and continue. Never deadlock waiting for a picker that cannot appear.
 
 ## 3. Memory auto-initialization
 
